@@ -1,15 +1,15 @@
 :root {
-  --wine: #290f12;
-  --wine-deep: #16070a;
-  --oxblood: #5b1a1d;
-  --vermilion: #b84332;
-  --gold: #c59b52;
-  --gold-soft: #ecd49d;
-  --parchment: #f0e7d3;
-  --paper: #fbf7ec;
-  --ink: #1e1714;
-  --ash: #807366;
-  --line: rgba(66, 39, 28, 0.18);
+  --wine: #2a2023;
+  --wine-deep: #171315;
+  --oxblood: #8c342e;
+  --vermilion: #a6312a;
+  --gold: #7b5d3c;
+  --gold-soft: #6f4c2e;
+  --parchment: #f4f2ee;
+  --paper: #fffefa;
+  --ink: #1d1a1b;
+  --ash: #615c57;
+  --line: rgba(52, 43, 38, 0.2);
   --serif: "Noto Serif SC", "STSong", serif;
   --display: "EB Garamond", "Noto Serif SC", serif;
   --mono: "DM Mono", monospace;
@@ -29,8 +29,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at 8% 3%, rgba(255, 255, 255, 0.82), transparent 28rem),
-    linear-gradient(110deg, #ebe0c9, var(--paper) 42%, #eee4d1);
+    radial-gradient(circle at 6% 2%, rgba(255, 255, 255, 0.95), transparent 30rem),
+    linear-gradient(110deg, #f0ede7, var(--paper) 42%, #eeeae1);
   font-family: var(--serif);
   font-size: 16px;
   line-height: 1.65;
@@ -85,7 +85,7 @@ svg {
   z-index: 20;
   inset: 0;
   pointer-events: none;
-  opacity: 0.12;
+  opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
@@ -100,7 +100,7 @@ svg {
   align-items: center;
   justify-content: space-between;
   padding: 1.45rem clamp(1.1rem, 5vw, 5rem);
-  color: var(--paper);
+  color: var(--ink);
 }
 
 .wordmark,
@@ -123,9 +123,9 @@ svg {
   width: 2rem;
   height: 2rem;
   place-items: center;
-  border: 1px solid rgba(234, 211, 158, 0.75);
+  border: 1px solid currentColor;
   border-radius: 50%;
-  color: var(--gold-soft);
+  color: var(--oxblood);
   font-family: var(--display);
   font-size: 1.45rem;
   font-style: italic;
@@ -144,7 +144,7 @@ svg {
 
 .wordmark small {
   margin-top: 0.12rem;
-  color: rgba(255, 247, 231, 0.55);
+  color: #675f5a;
   font-family: var(--mono);
   font-size: 0.47rem;
   letter-spacing: 0.13em;
@@ -160,15 +160,15 @@ svg {
   height: 2.55rem;
   padding: 0;
   place-items: center;
-  border: 1px solid rgba(255, 245, 225, 0.3);
+  border: 1px solid rgba(42, 32, 35, 0.45);
   border-radius: 50%;
   background: transparent;
-  color: var(--paper);
+  color: var(--ink);
   transition: background 180ms var(--ease), transform 180ms var(--ease);
 }
 
 .icon-button:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(42, 32, 35, 0.09);
   transform: translateY(-2px);
 }
 
@@ -195,16 +195,15 @@ svg {
 .hero {
   position: relative;
   display: grid;
-  min-height: min(52rem, 100svh);
+  min-height: min(47rem, 100svh);
   padding: 8.7rem clamp(1.1rem, 7vw, 8rem) 5.6rem;
   grid-template-columns: minmax(0, 1.05fr) minmax(16rem, 0.95fr);
   gap: clamp(2rem, 6vw, 7rem);
   align-items: center;
   overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(24, 7, 10, 0.82) 0%, rgba(42, 11, 14, 0.78) 47%, rgba(27, 6, 9, 0.38) 100%),
-    var(--hero-image) center 30% / cover;
-  color: var(--paper);
+    linear-gradient(135deg, rgba(255, 254, 250, 0.98) 0%, rgba(246, 242, 235, 0.96) 52%, rgba(230, 222, 211, 0.94) 100%);
+  color: var(--ink);
 }
 
 .hero::after {
@@ -212,8 +211,8 @@ svg {
   content: "";
   inset: 0;
   background:
-    linear-gradient(90deg, transparent 49.8%, rgba(225, 194, 129, 0.17) 50%, transparent 50.25%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.32), transparent 45%);
+    linear-gradient(90deg, transparent 49.8%, rgba(42, 32, 35, 0.08) 50%, transparent 50.16%),
+    radial-gradient(circle at 20% 80%, rgba(139, 54, 47, 0.08), transparent 29rem);
   pointer-events: none;
 }
 
@@ -239,7 +238,7 @@ svg {
 }
 
 .hero-eyebrow {
-  color: var(--gold-soft);
+  color: var(--oxblood);
 }
 
 .hero h1 {
@@ -261,7 +260,7 @@ svg {
 
 .hero h1 em {
   margin-top: 0.75rem;
-  color: var(--gold-soft);
+  color: var(--oxblood);
   font-family: var(--display);
   font-size: clamp(1.85rem, 3.7vw, 4rem);
   font-style: italic;
@@ -271,7 +270,7 @@ svg {
 .hero-intro {
   margin: 0;
   max-width: 28rem;
-  color: rgba(255, 245, 228, 0.76);
+  color: #4b4540;
   font-size: clamp(0.94rem, 1.45vw, 1.12rem);
   letter-spacing: 0.025em;
 }
@@ -295,15 +294,17 @@ svg {
   align-items: center;
   gap: 1.2rem;
   padding: 0.9rem 1.1rem 0.9rem 1.4rem;
-  border: 1px solid var(--gold-soft);
-  color: var(--gold-soft);
+  border: 1px solid var(--wine);
+  background: var(--wine);
+  color: var(--paper);
   font-size: 0.88rem;
   transition: color 180ms var(--ease), background 180ms var(--ease);
 }
 
 .primary-cta:hover {
-  background: var(--gold-soft);
-  color: var(--wine);
+  background: var(--oxblood);
+  border-color: var(--oxblood);
+  color: var(--paper);
 }
 
 .primary-cta svg {
@@ -313,8 +314,8 @@ svg {
 
 .text-cta {
   padding: 0.7rem 0;
-  border-bottom: 1px solid rgba(255, 245, 228, 0.48);
-  color: rgba(255, 245, 228, 0.9);
+  border-bottom: 1px solid currentColor;
+  color: var(--ink);
   font-size: 0.84rem;
 }
 
@@ -328,10 +329,10 @@ svg {
   position: relative;
   aspect-ratio: 0.71;
   padding: 0.65rem;
-  border: 1px solid rgba(243, 217, 160, 0.55);
-  background: rgba(239, 209, 147, 0.08);
-  box-shadow: 1.3rem 1.3rem 0 rgba(0, 0, 0, 0.2);
-  transform: rotate(3deg);
+  border: 1px solid rgba(42, 32, 35, 0.74);
+  background: var(--paper);
+  box-shadow: 1.2rem 1.2rem 0 rgba(42, 32, 35, 0.11);
+  transform: rotate(1.2deg);
 }
 
 .hero-art-frame img {
@@ -344,7 +345,7 @@ svg {
 .art-scrim {
   position: absolute;
   inset: 0.65rem;
-  background: linear-gradient(0deg, rgba(12, 2, 3, 0.55), transparent 48%);
+  display: none;
 }
 
 .hero-art figcaption {
@@ -352,12 +353,12 @@ svg {
   margin-top: 1.45rem;
   justify-content: space-between;
   gap: 1rem;
-  color: rgba(255, 245, 228, 0.73);
+  color: #5d5651;
   font-size: 0.73rem;
 }
 
 .hero-art figcaption span:first-child {
-  color: var(--gold-soft);
+  color: var(--oxblood);
   font-family: var(--mono);
 }
 
@@ -368,11 +369,11 @@ svg {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: rgba(255, 245, 228, 0.8);
+  color: #4b4540;
 }
 
 .hero-credential span {
-  color: var(--gold-soft);
+  color: var(--oxblood);
   font-family: var(--display);
   font-size: 4.8rem;
   font-style: italic;
@@ -391,7 +392,7 @@ svg {
   justify-content: space-between;
   gap: 1rem 2.5rem;
   border-bottom: 1px solid var(--line);
-  background: #e8ddc7;
+  background: #ebe7df;
 }
 
 .visit-strip div {
@@ -552,8 +553,8 @@ svg {
 
 .focus-section {
   padding: clamp(4rem, 8vw, 8rem) clamp(1.1rem, 7vw, 8rem);
-  background: var(--wine);
-  color: var(--paper);
+  background: #e9e4da;
+  color: var(--ink);
 }
 
 .focus-topline {
@@ -562,7 +563,7 @@ svg {
 }
 
 .focus-topline .eyebrow {
-  color: var(--gold-soft);
+  color: var(--oxblood);
 }
 
 .refresh-focus {
@@ -570,8 +571,8 @@ svg {
   padding: 0.25rem 0;
   align-items: center;
   gap: 0.45rem;
-  border-bottom: 1px solid rgba(245, 229, 194, 0.45);
-  color: var(--paper);
+  border-bottom: 1px solid currentColor;
+  color: var(--ink);
   font-size: 0.75rem;
 }
 
@@ -594,7 +595,7 @@ svg {
   position: relative;
   aspect-ratio: 0.78;
   overflow: hidden;
-  background: #3b181a;
+  background: #d9d0c3;
 }
 
 .focus-image img {
@@ -626,7 +627,7 @@ svg {
 .focus-copy h3 span {
   display: block;
   margin-top: 0.6rem;
-  color: var(--gold-soft);
+  color: var(--oxblood);
   font-family: var(--display);
   font-size: 0.57em;
   font-style: italic;
@@ -636,7 +637,7 @@ svg {
 .focus-copy > p {
   max-width: 34rem;
   margin: 1.6rem 0;
-  color: rgba(255, 245, 228, 0.75);
+  color: #45403b;
   font-size: 0.99rem;
   line-height: 1.9;
 }
@@ -647,9 +648,9 @@ svg {
   gap: 0.5rem;
   padding: 0;
   border: 0;
-  border-bottom: 1px solid var(--gold-soft);
+  border-bottom: 1px solid var(--wine);
   background: transparent;
-  color: var(--gold-soft);
+  color: var(--wine);
   font-size: 0.81rem;
 }
 
@@ -879,15 +880,13 @@ svg {
 
 .closing-section {
   padding: clamp(6rem, 13vw, 12rem) 1.1rem;
-  background:
-    linear-gradient(rgba(31, 7, 10, 0.89), rgba(31, 7, 10, 0.93)),
-    var(--closing-image) center / cover;
-  color: var(--paper);
+  background: #f0ece5;
+  color: var(--ink);
   text-align: center;
 }
 
 .closing-section .eyebrow {
-  color: var(--gold-soft);
+  color: var(--oxblood);
 }
 
 .closing-quote {
@@ -898,8 +897,8 @@ svg {
 }
 
 .closing-link {
-  border-bottom: 1px solid var(--gold-soft);
-  color: var(--gold-soft);
+  border-bottom: 1px solid var(--wine);
+  color: var(--wine);
   font-size: 0.88rem;
 }
 
@@ -917,8 +916,9 @@ svg {
   padding: 1.9rem clamp(1.1rem, 7vw, 8rem) max(2rem, env(safe-area-inset-bottom));
   justify-content: space-between;
   gap: 1.5rem;
-  background: #1b080b;
-  color: rgba(255, 245, 228, 0.57);
+  border-top: 1px solid var(--line);
+  background: #e5e0d7;
+  color: #58514b;
 }
 
 .site-footer p,
@@ -927,7 +927,7 @@ svg {
 }
 
 .site-footer > div > p {
-  color: var(--paper);
+  color: var(--ink);
   font-size: 0.8rem;
 }
 
@@ -1304,7 +1304,7 @@ button.result-item {
   }
 
   .hero::after {
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.4), transparent 48%);
+    background: radial-gradient(circle at 20% 80%, rgba(139, 54, 47, 0.08), transparent 24rem);
   }
 
   .hero h1 span {
@@ -1475,10 +1475,10 @@ button.result-item {
     display: grid;
     padding: 0.35rem;
     grid-template-columns: repeat(4, 1fr);
-    border: 1px solid rgba(246, 229, 188, 0.23);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 0.85rem;
-    background: rgba(35, 7, 10, 0.94);
-    box-shadow: 0 0.75rem 1.8rem rgba(26, 4, 6, 0.28);
+    background: rgba(42, 32, 35, 0.96);
+    box-shadow: 0 0.75rem 1.8rem rgba(26, 4, 6, 0.18);
     backdrop-filter: blur(18px);
   }
 
@@ -1490,7 +1490,7 @@ button.result-item {
     gap: 0.13rem;
     border: 0;
     background: transparent;
-    color: rgba(255, 245, 228, 0.78);
+    color: #fffdfa;
     font-family: var(--serif);
     font-size: 0.62rem;
   }
@@ -1498,7 +1498,7 @@ button.result-item {
   .mobile-nav svg {
     width: 1.05rem;
     height: 1.05rem;
-    color: var(--gold-soft);
+    color: #f5d999;
   }
 
   .art-dialog {

@@ -105,6 +105,14 @@ function cardTemplate(artwork) {
 }
 
 function bindArtworkInteractions(parent = document) {
+  $$("img", parent).forEach((image) => {
+    image.addEventListener("error", () => {
+      if (image.dataset.usedFallback) return;
+      image.dataset.usedFallback = "true";
+      image.src = imageAssets.fallback;
+    });
+  });
+
   $$(".art-open", parent).forEach((button) => {
     button.addEventListener("click", () => {
       const id = button.closest("[data-artwork]").dataset.artwork;
@@ -327,6 +335,17 @@ function closeOnBackdrop(dialog) {
 }
 
 function init() {
+  document.addEventListener(
+    "error",
+    (event) => {
+      const image = event.target;
+      if (!(image instanceof HTMLImageElement) || image.dataset.usedFallback) return;
+      image.dataset.usedFallback = "true";
+      image.src = imageAssets.fallback;
+    },
+    true,
+  );
+
   document.documentElement.style.setProperty("--hero-image", `url("${imageAssets.hero}")`);
   document.documentElement.style.setProperty("--closing-image", `url("${imageAssets.closing}")`);
   $("#hero-art-image").src = imageAssets.hero;
