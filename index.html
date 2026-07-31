@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="致敬巨匠：从达·芬奇到卡拉瓦乔——意大利文艺复兴名作展 36 件展品移动观展指南。"
+    />
+    <meta name="theme-color" content="#290f12" />
+    <title>致敬巨匠 · 36 件作品观展指南</title>
+    <link
+      rel="preconnect"
+      href="https://miaoda.feishu.cn"
+    />
+    <link
+      rel="stylesheet"
+      href="https://miaoda.feishu.cn/fonts/css2?family=DM+Mono:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="wordmark" href="#top" aria-label="返回展览首页">
+        <span class="wordmark-mark">M</span>
+        <span>
+          <strong>致敬巨匠</strong>
+          <small>PRIVATE VIEWING GUIDE</small>
+        </span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-button" id="open-search" type="button" aria-label="搜索作品">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.8" cy="10.8" r="5.9"></circle>
+            <path d="m15.4 15.4 4.2 4.2"></path>
+          </svg>
+        </button>
+        <button class="icon-button saved-button" id="open-saved" type="button" aria-label="查看收藏">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.5 4.3h11v15.4l-5.5-3.4-5.5 3.4V4.3Z"></path>
+          </svg>
+          <span id="saved-count">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-orb hero-orb-one" aria-hidden="true"></div>
+        <div class="hero-orb hero-orb-two" aria-hidden="true"></div>
+        <div class="hero-copy">
+          <p class="eyebrow hero-eyebrow">CHINA NATIONAL ART MUSEUM · 2026</p>
+          <h1 id="hero-title">
+            <span>致敬巨匠</span>
+            <em>从达·芬奇到卡拉瓦乔</em>
+          </h1>
+          <p class="hero-intro">
+            一份为现场而生的 36 件名作阅读地图。<br />
+            从一张手稿开始，走进文艺复兴如何重新发明“人”。
+          </p>
+          <div class="hero-cta-row">
+            <a class="primary-cta" href="#route">
+              <span>开始一场慢看的旅程</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 12h15"></path>
+                <path d="m13 6 6 6-6 6"></path>
+              </svg>
+            </a>
+            <button class="text-cta" id="surprise-me" type="button">
+              随机抽一件
+            </button>
+          </div>
+        </div>
+        <figure class="hero-art">
+          <div class="hero-art-frame">
+            <img
+              id="hero-art-image"
+              src=""
+              alt="达·芬奇《战斗中的骑士、半人马与战士》局部"
+            />
+            <div class="art-scrim"></div>
+          </div>
+          <figcaption>
+            <span>01 / 36</span>
+            <span>达·芬奇 · 纸上正在发生的风暴</span>
+          </figcaption>
+        </figure>
+        <div class="hero-credential">
+          <span>36</span>
+          <p>件真迹<br />一部视觉史</p>
+        </div>
+      </section>
+
+      <section class="visit-strip" aria-label="展览信息">
+        <div>
+          <span>展期</span>
+          <strong>2026.04.28—08.28</strong>
+        </div>
+        <div>
+          <span>地点</span>
+          <strong>中国美术馆 · 3 / 5 / 7 号厅</strong>
+        </div>
+        <a
+          href="https://www.namoc.cn/namoc/zhanlan/202605/ef6f896f9b98468aa9f38800aa464d59.shtml"
+          target="_blank"
+          rel="noreferrer"
+        >
+          官方展讯
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 17 17 7"></path>
+            <path d="M9 7h8v8"></path>
+          </svg>
+        </a>
+      </section>
+
+      <section class="route-section section-shell" id="route" aria-labelledby="route-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">THREE WAYS OF SEEING</p>
+            <h2 id="route-title">不按年代背诵，<br /><em>按眼睛的变化走。</em></h2>
+          </div>
+          <p class="section-lede">
+            36 件作品并非一排名字。把它们看作三次观看方式的转向：
+            从观察人体与现实，到颜色与欲望，再到优雅开始失衡的时代。
+          </p>
+        </div>
+        <div class="chapter-list" id="chapter-list"></div>
+      </section>
+
+      <section class="focus-section" id="focus" aria-labelledby="focus-title">
+        <div class="focus-topline">
+          <p class="eyebrow">A PRIVATE APPOINTMENT</p>
+          <button class="refresh-focus" id="refresh-focus" type="button">
+            换一件相遇
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 9a7.5 7.5 0 1 0 1.1 6.2"></path>
+              <path d="M19 4v5h-5"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="focus-work" id="focus-work"></div>
+      </section>
+
+      <section class="collection-section section-shell" id="collection" aria-labelledby="collection-title">
+        <div class="collection-header">
+          <div>
+            <p class="eyebrow">THE COMPLETE CHECKLIST</p>
+            <h2 id="collection-title">三十六件，<em>逐一相遇。</em></h2>
+          </div>
+          <p>每件作品都有一个小入口：先看一眼，再决定是否停留。</p>
+        </div>
+        <div class="filter-bar" id="filter-bar" aria-label="作品章节筛选"></div>
+        <div class="gallery-grid" id="gallery-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="how-to section-shell" aria-labelledby="how-to-title">
+        <div class="how-to-layout">
+          <div class="how-to-copy">
+            <p class="eyebrow">HOW TO USE THIS GUIDE</p>
+            <h2 id="how-to-title">让手机少一点，<br /><em>眼睛多一点。</em></h2>
+            <p>
+              这不是替代现场的知识库，而是一只轻便的放大镜。进入展厅前选三件；
+              在画前先看 30 秒；离开时再打开一次，记录真正留下来的那幅。
+            </p>
+          </div>
+          <ol class="ritual-list">
+            <li><span>01</span><p><strong>先不读</strong>把画面看成颜色、光、身体和方向。</p></li>
+            <li><span>02</span><p><strong>再打开</strong>用“看什么”和“画面线索”找一条进入画面的路。</p></li>
+            <li><span>03</span><p><strong>最后收藏</strong>将想回看的作品放进私人清单，展后继续慢读。</p></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="closing-section">
+        <p class="eyebrow">FROM FLORENCE TO BEIJING</p>
+        <p class="closing-quote">“绘画不是答案，<br />而是一种更久的凝视。”</p>
+        <a class="closing-link" href="#collection">回到全部作品 <span>↗</span></a>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" aria-label="移动导航">
+      <a href="#route">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 18 6-12 4 8 6-4"></path></svg>
+        路线
+      </a>
+      <button id="mobile-search" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="5.9"></circle><path d="m15.4 15.4 4.2 4.2"></path></svg>
+        搜索
+      </button>
+      <a href="#collection">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v15H5z"></path><path d="M8 8h8M8 12h5"></path></svg>
+        清单
+      </a>
+      <button id="mobile-saved" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.3h11v15.4l-5.5-3.4-5.5 3.4V4.3Z"></path></svg>
+        收藏
+      </button>
+    </nav>
+
+    <dialog class="art-dialog" id="art-dialog">
+      <div class="dialog-shell">
+        <button class="dialog-close" type="button" aria-label="关闭详情">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+        </button>
+        <div id="dialog-content"></div>
+      </div>
+    </dialog>
+
+    <dialog class="search-dialog" id="search-dialog">
+      <div class="search-shell">
+        <div class="search-head">
+          <p class="eyebrow">FIND A WORK</p>
+          <button class="dialog-close" data-close-search type="button" aria-label="关闭搜索">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+        <label class="search-field">
+          <span class="sr-only">搜索作品、艺术家或题材</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="5.9"></circle><path d="m15.4 15.4 4.2 4.2"></path></svg>
+          <input id="search-input" type="search" placeholder="作品名、艺术家、题材…" autocomplete="off" />
+        </label>
+        <div class="search-results" id="search-results"></div>
+      </div>
+    </dialog>
+
+    <dialog class="saved-dialog" id="saved-dialog">
+      <div class="saved-shell">
+        <div class="search-head">
+          <div>
+            <p class="eyebrow">YOUR PRIVATE CHECKLIST</p>
+            <h2>想再看一眼的作品</h2>
+          </div>
+          <button class="dialog-close" data-close-saved type="button" aria-label="关闭收藏">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+        <div class="saved-results" id="saved-results"></div>
+      </div>
+    </dialog>
+
+    <footer class="site-footer">
+      <div>
+        <p>致敬巨匠 · 观展私人指南</p>
+        <small>为现场慢看而设计 · 非官方导览</small>
+      </div>
+      <p>
+        展览基础信息与重点作品图源：中国美术馆官方展讯。<br />
+        其余图像按卡片标注使用公开馆藏资源；解读为观展辅助，现场展签优先。
+      </p>
+    </footer>
+
+    <script type="module" src="./assets/app.js"></script>
+  </body>
+</html>
