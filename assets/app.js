@@ -9,27 +9,24 @@ import { artistProfiles, curatorialNotes } from "../data/curatorial-notes.js";
 
 const state = {
   activeFilter: "all",
-  focusId: 15,
+  focusId: 1,
   saved: new Set(JSON.parse(localStorage.getItem("renaissance-saved") || "[]")),
   currentPage: "home",
   searchQuery: "",
+  overlay: null,
 };
 
 const $ = (selector, parent = document) => parent.querySelector(selector);
 const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
 const number = (id) => String(id).padStart(2, "0");
-const pageIds = new Set(["home", "route", "focus", "collection", "search", "saved"]);
+const pageIds = new Set(["home", "route", "collection"]);
+const overlayIds = new Set(["search", "saved"]);
 let revealObserver;
+let lastOverlayTrigger = null;
 
 const bookmarkIcon = (filled = false) => `
   <svg viewBox="0 0 24 24" aria-hidden="true" ${filled ? 'fill="currentColor"' : ""}>
     <path d="M6.5 4.3h11v15.4l-5.5-3.4-5.5 3.4V4.3Z"></path>
-  </svg>
-`;
-
-const arrowIcon = () => `
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path>
   </svg>
 `;
 
@@ -45,6 +42,7 @@ function routeFromLocation() {
   const page = pageFromLocation();
   const chapter = params.get("chapter");
   const artworkId = Number(params.get("artwork"));
+  const panel = params.get("panel");
 
   return {
     page,
@@ -52,8 +50,10 @@ function routeFromLocation() {
       page === "collection" && chapters.some(({ id }) => id === chapter)
         ? chapter
         : "all",
-    searchQuery: page === "search" ? params.get("q") || "" : "",
+    searchQuery: params.get("q") || "",
+    overlay: overlayIds.has(panel) ? panel : null,
     artworkId: artworkById(artworkId) ? artworkId : null,
+    modalEntry: null,
     scroll: { x: 0, y: 0 },
   };
 }
@@ -62,6 +62,7 @@ function routeUrl({
   page = state.currentPage,
   activeFilter = state.activeFilter,
   searchQuery = state.searchQuery,
+  overlay = state.overlay,
   artworkId = null,
 }) {
   const url = new URL(window.location.href);
@@ -72,7 +73,10 @@ function routeUrl({
   if (page === "collection" && activeFilter !== "all") {
     url.searchParams.set("chapter", activeFilter);
   }
-  if (page === "search" && searchQuery) {
+  if (overlay) {
+    url.searchParams.set("panel", overlay);
+  }
+  if (overlay === "search" && searchQuery) {
     url.searchParams.set("q", searchQuery);
   }
   if (artworkId) {
@@ -86,14 +90,18 @@ function createHistoryState({
   page = state.currentPage,
   activeFilter = state.activeFilter,
   searchQuery = state.searchQuery,
+  overlay = state.overlay,
   artworkId = null,
+  modalEntry = history.state?.modalEntry || null,
   scroll = { x: window.scrollX, y: window.scrollY },
 } = {}) {
   return {
     page,
     activeFilter,
     searchQuery,
+    overlay,
     artworkId,
+    modalEntry,
     scroll,
   };
 }
@@ -101,7 +109,7 @@ function createHistoryState({
 function updateRouteLinks() {
   $$("[data-route-page]").forEach((element) => {
     const page = element.dataset.routePage;
-    const isActive = state.currentPage === page;
+    const isActive = state.currentPage === page && !state.overlay;
 
     element.classList.toggle("is-active", isActive);
     if (element instanceof HTMLAnchorElement) {
@@ -111,6 +119,13 @@ function updateRouteLinks() {
         element.removeAttribute("aria-current");
       }
     }
+  });
+
+  $$("[data-open-overlay]").forEach((element) => {
+    element.classList.toggle(
+      "is-active",
+      state.overlay === element.dataset.openOverlay,
+    );
   });
 }
 
@@ -126,15 +141,9 @@ function renderPage(page = state.currentPage) {
 
   if (page === "route") {
     renderChapters();
-  } else if (page === "focus") {
-    renderFocus();
   } else if (page === "collection") {
     renderFilters();
     renderGallery();
-  } else if (page === "search") {
-    renderSearch(state.searchQuery);
-  } else if (page === "saved") {
-    renderSaved();
   }
 
   observeRevealElements();
@@ -150,40 +159,122 @@ function saveScrollPosition() {
 
 function navigateTo(
   page,
-  {
-    activeFilter = state.activeFilter,
-    searchQuery = state.searchQuery,
-    focusSearch = false,
-  } = {},
+  { activeFilter = state.activeFilter } = {},
 ) {
   const nextPage = pageIds.has(page) ? page : "home";
+  // Leaving for a page always closes any open overlay.
+  state.overlay = null;
   saveScrollPosition();
   const nextState = createHistoryState({
     page: nextPage,
     activeFilter: nextPage === "collection" ? activeFilter : "all",
-    searchQuery: nextPage === "search" ? searchQuery : "",
+    overlay: null,
+    modalEntry: null,
     scroll: { x: 0, y: 0 },
   });
 
   history.pushState(nextState, "", routeUrl(nextState));
   state.activeFilter = nextState.activeFilter;
-  state.searchQuery = nextState.searchQuery;
   renderPage(nextPage);
+  syncOverlays();
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  if (focusSearch) {
-    requestAnimationFrame(() => $("#search-input").focus());
-  }
 }
 
 function bindRouteLinks() {
   $$("[data-route-page]").forEach((element) => {
     element.addEventListener("click", (event) => {
       event.preventDefault();
-      navigateTo(element.dataset.routePage, {
-        focusSearch: element.dataset.routePage === "search",
-      });
+      navigateTo(element.dataset.routePage);
     });
   });
+}
+
+// ---- Overlays (search / saved): float above the page, blur behind ----
+function openOverlay(name) {
+  if (!overlayIds.has(name)) return;
+  if (state.overlay === name) {
+    closeOverlay();
+    return;
+  }
+  if (document.activeElement instanceof HTMLElement) {
+    lastOverlayTrigger = document.activeElement;
+  }
+  saveScrollPosition();
+  state.overlay = name;
+  const nextState = createHistoryState({
+    overlay: name,
+    modalEntry: "overlay",
+    scroll: { x: 0, y: 0 },
+  });
+  history.pushState(nextState, "", routeUrl(nextState));
+  syncOverlays();
+}
+
+function closeOverlay() {
+  if (!state.overlay) return;
+  // Prefer stepping back so the URL/history stays clean; the popstate
+  // handler will run syncOverlays().
+  if (history.state?.modalEntry === "overlay") {
+    history.back();
+    return;
+  }
+  state.overlay = null;
+  const nextState = createHistoryState({
+    overlay: null,
+    modalEntry: null,
+  });
+  history.replaceState(nextState, "", routeUrl(nextState));
+  syncOverlays();
+}
+
+function syncOverlays(restoreFocus = true) {
+  const active = state.overlay;
+  const wasOpen = document.body.classList.contains("overlay-open");
+  ["search", "saved"].forEach((name) => {
+    const el = $(`#${name}-overlay`);
+    if (!el) return;
+    const isOpen = active === name;
+    el.setAttribute("aria-hidden", String(!isOpen));
+    if (isOpen) {
+      el.hidden = false;
+      requestAnimationFrame(() => {
+        if (state.overlay === name) el.classList.add("is-open");
+      });
+    } else {
+      el.classList.remove("is-open");
+      window.setTimeout(() => {
+        if (state.overlay !== name) el.hidden = true;
+      }, 360);
+    }
+  });
+
+  document.body.classList.toggle("overlay-open", Boolean(active));
+  [$(".site-header"), $("main"), $(".mobile-nav"), $(".site-footer")]
+    .filter(Boolean)
+    .forEach((element) => {
+      element.inert = Boolean(active);
+      if (active) {
+        element.setAttribute("aria-hidden", "true");
+      } else {
+        element.removeAttribute("aria-hidden");
+      }
+    });
+
+  if (active === "search") {
+    renderSearch(state.searchQuery);
+    const input = $("#search-input");
+    const clear = $("#search-clear");
+    input.value = state.searchQuery;
+    clear.hidden = !state.searchQuery;
+    requestAnimationFrame(() => input.focus());
+  } else if (active === "saved") {
+    renderSaved();
+    requestAnimationFrame(() => $("#saved-close")?.focus());
+  } else if (wasOpen && restoreFocus) {
+    requestAnimationFrame(() => lastOverlayTrigger?.focus());
+  }
+
+  updateRouteLinks();
 }
 
 function renderChapters() {
@@ -300,29 +391,6 @@ function renderGallery() {
   const artList = displayedArtworks();
   $("#gallery-grid").innerHTML = artList.map(cardTemplate).join("");
   bindArtworkInteractions($("#gallery-grid"));
-}
-
-function renderFocus() {
-  const artwork = artworkById(state.focusId);
-  const note = curatorialNotes[artwork.id];
-  $("#focus-work").innerHTML = `
-    <div class="focus-layout" data-artwork="${artwork.id}">
-      <div class="focus-image">
-        <img src="${artwork.image}" alt="${artwork.artist}《${artwork.title}》" />
-        <span>${number(artwork.id)} / 36</span>
-      </div>
-      <div class="focus-copy">
-        <p class="eyebrow">${artwork.artist.toUpperCase()} · ${artwork.period}</p>
-        <h3>${artwork.title}${artwork.subtitle ? `<span>${artwork.subtitle}</span>` : ""}</h3>
-        <p>${note?.scene || artwork.look}</p>
-        <button class="detail-link" data-focus-open="${artwork.id}" type="button">
-          查看这件作品的讲解 ${arrowIcon()}
-        </button>
-      </div>
-    </div>
-  `;
-
-  $("[data-focus-open]").addEventListener("click", () => openArtwork(state.focusId));
 }
 
 function renderDialog(artwork) {
@@ -494,8 +562,14 @@ function openArtwork(id) {
   if (!artwork) return;
 
   saveScrollPosition();
+  // Opening a work supersedes any overlay; hide it so the dialog reads clean
+  // and Back from the dialog returns to the underlying page.
+  state.overlay = null;
+  syncOverlays(false);
   const artworkState = createHistoryState({
     artworkId: artwork.id,
+    overlay: null,
+    modalEntry: "artwork",
     scroll: { x: 0, y: 0 },
   });
   history.pushState(artworkState, "", routeUrl(artworkState));
@@ -506,12 +580,17 @@ function closeArtwork() {
   const dialog = $("#art-dialog");
   if (!dialog.open) return;
 
-  if (history.state?.artworkId) {
+  if (history.state?.modalEntry === "artwork") {
     history.back();
     return;
   }
 
   dialog.close();
+  const nextState = createHistoryState({
+    artworkId: null,
+    modalEntry: null,
+  });
+  history.replaceState(nextState, "", routeUrl(nextState));
 }
 
 function toggleSaved(id) {
@@ -523,21 +602,22 @@ function toggleSaved(id) {
   localStorage.setItem("renaissance-saved", JSON.stringify([...state.saved]));
   updateSavedCount();
   renderGallery();
-  renderFocus();
 
   if ($("#art-dialog").open) {
     showArtwork(history.state?.artworkId);
   }
-  if (state.currentPage === "saved") {
+  if (state.overlay === "saved") {
     renderSaved();
   }
 }
 
 function updateSavedCount() {
-  $("#saved-count").textContent = state.saved.size;
-  $("#saved-count").hidden = state.saved.size === 0;
-  $("#dock-saved-count").textContent = state.saved.size;
-  $("#dock-saved-count").hidden = state.saved.size === 0;
+  const count = state.saved.size;
+  const badge = $("#saved-count");
+  if (badge) {
+    badge.textContent = count;
+    badge.hidden = count === 0;
+  }
 }
 
 function renderSearch(query = "") {
@@ -604,10 +684,23 @@ function renderSaved() {
   });
 }
 
-function chooseNextFocus() {
+async function spinToRandomWork() {
   const available = artworks.filter((artwork) => artwork.id !== state.focusId);
   state.focusId = available[Math.floor(Math.random() * available.length)].id;
-  renderFocus();
+  const next = artworkById(state.focusId);
+  if (!next) return state.focusId;
+
+  await heroScene?.setArtwork(next.image);
+  $("#hero-art-image").src = next.image;
+  $("#hero-art-image").alt = `${next.artist}《${next.title}》`;
+  const caption = $(".hero-art figcaption");
+  if (caption) {
+    caption.innerHTML = `
+      <span>${number(next.id)} / 36</span>
+      <span>${next.artist} · ${next.title}</span>
+    `;
+  }
+  return state.focusId;
 }
 
 function updateCurrentRoute() {
@@ -648,6 +741,44 @@ function observeRevealElements() {
       revealObserver.observe(element);
     },
   );
+}
+
+let heroScene = null;
+
+async function initHero3D() {
+  const canvas = $("#hero-canvas");
+  const heroArt = $(".hero-art");
+  if (!canvas || !heroArt) return;
+
+  const initialArtworkId = state.focusId;
+  try {
+    const { createHeroScene } = await import("./hero3d.js");
+    heroScene = await createHeroScene({
+      canvas,
+      initialImage: artworkById(initialArtworkId)?.image || imageAssets.hero,
+      onActivate: () => openArtwork(state.focusId || 1),
+    });
+  } catch (error) {
+    heroScene = null;
+  }
+
+  if (heroScene) {
+    if (state.focusId !== initialArtworkId) {
+      const current = artworkById(state.focusId);
+      if (current) await heroScene.setArtwork(current.image);
+    }
+    // 3D took over — retire the flat CSS frame and reveal the live canvas.
+    heroArt.classList.add("is-3d");
+    const hint = $("#hero-drag-hint");
+    if (hint) {
+      const dismiss = () => hint.classList.add("is-hidden");
+      canvas.addEventListener("pointerdown", dismiss, { once: true });
+      setTimeout(dismiss, 6000);
+    }
+  } else {
+    // No WebGL: keep the CSS frame and its pointer parallax.
+    initHeroDepth();
+  }
 }
 
 function initHeroDepth() {
@@ -692,15 +823,31 @@ function init() {
     true,
   );
 
-  document.documentElement.style.setProperty("--hero-image", `url("${imageAssets.hero}")`);
-  document.documentElement.style.setProperty("--closing-image", `url("${imageAssets.closing}")`);
+  // Resolve against the document so CSS vars don't inherit the stylesheet's
+  // /assets/ base (which would double the path to /assets/assets/...).
+  const absUrl = (path) => new URL(path, window.location.href).href;
+  document.documentElement.style.setProperty("--hero-image", `url("${absUrl(imageAssets.hero)}")`);
+  document.documentElement.style.setProperty("--closing-image", `url("${absUrl(imageAssets.closing)}")`);
   $("#hero-art-image").src = imageAssets.hero;
   updateSavedCount();
   bindRouteLinks();
-  $("#refresh-focus").addEventListener("click", chooseNextFocus);
-  $("#surprise-me").addEventListener("click", () => {
-    chooseNextFocus();
-    navigateTo("focus");
+
+  // Top-bar buttons open floating overlays instead of routing to pages.
+  $("#open-search").addEventListener("click", () => openOverlay("search"));
+  $("#open-saved").addEventListener("click", () => openOverlay("saved"));
+
+  $("#surprise-me").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.classList.add("is-spinning");
+    await spinToRandomWork();
+    button.classList.remove("is-spinning");
+    button.disabled = false;
+  });
+
+  // Overlay dismissal: × button, click on scrim, or Escape.
+  $$("[data-overlay-dismiss], .overlay-close").forEach((el) => {
+    el.addEventListener("click", closeOverlay);
   });
 
   $("#art-dialog").addEventListener("cancel", (event) => {
@@ -713,18 +860,55 @@ function init() {
       closeArtwork();
     }
   });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.overlay && !$("#art-dialog").open) {
+      event.preventDefault();
+      closeOverlay();
+      return;
+    }
+    if (event.key === "Tab" && state.overlay) {
+      const panel = $(`#${state.overlay}-overlay .overlay-panel`);
+      const focusable = $$(
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        panel,
+      ).filter((element) => !element.hidden);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
   $("#search-input").addEventListener("input", (event) => {
     state.searchQuery = event.target.value;
     renderSearch(state.searchQuery);
+    $("#search-clear").hidden = !state.searchQuery;
     updateCurrentRoute();
+  });
+  $("#search-clear").addEventListener("click", () => {
+    state.searchQuery = "";
+    $("#search-input").value = "";
+    $("#search-clear").hidden = true;
+    renderSearch("");
+    updateCurrentRoute();
+    $("#search-input").focus();
   });
 
   window.addEventListener("popstate", (event) => {
     const nextState = event.state || routeFromLocation();
-    state.currentPage = nextState.page || pageFromLocation();
+    state.currentPage = pageIds.has(nextState.page) ? nextState.page : "home";
     state.activeFilter = nextState.activeFilter || "all";
     state.searchQuery = nextState.searchQuery || "";
+    state.overlay = overlayIds.has(nextState.overlay) ? nextState.overlay : null;
     renderPage(state.currentPage);
+    syncOverlays();
 
     if ($("#art-dialog").open) {
       $("#art-dialog").close();
@@ -746,13 +930,15 @@ function init() {
   state.currentPage = initialState.page;
   state.activeFilter = initialState.activeFilter;
   state.searchQuery = initialState.searchQuery;
+  state.overlay = initialState.overlay;
   history.replaceState(initialState, "", routeUrl(initialState));
   initRevealObserver();
   renderPage(initialState.page);
+  syncOverlays();
   if (initialState.artworkId) {
     showArtwork(initialState.artworkId);
   }
-  initHeroDepth();
+  initHero3D();
 }
 
 init();
