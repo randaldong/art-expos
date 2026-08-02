@@ -2,5 +2,9 @@
   "name": "miaoda-design-html-app",
   "version": "0.1.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 4173 --directory .",
+    "check": "node scripts/check-image-urls.mjs && python3 scripts/check-image-similarity.py && node scripts/check-story-guides.mjs && node --check assets/app.js && node --check data/artworks.js && node --check data/curatorial-notes.js"
+  }
 }
