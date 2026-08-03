@@ -81,15 +81,6 @@ svg {
   stroke-width: 1.65;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-}
-
 .grain {
   position: fixed;
   z-index: 30;
@@ -236,7 +227,7 @@ svg {
   grid-template-columns: minmax(0, 0.94fr) minmax(19rem, 1.06fr);
   gap: clamp(2rem, 6vw, 7rem);
   align-items: center;
-  overflow: hidden;
+  overflow: clip;
   background:
     radial-gradient(circle at 75% 44%, rgba(195, 133, 69, 0.2), transparent 18rem),
     radial-gradient(circle at 18% 80%, rgba(128, 35, 38, 0.32), transparent 30rem),
@@ -417,6 +408,7 @@ svg {
 .hero-art {
   position: relative;
   width: min(100%, 34rem);
+  isolation: isolate;
   justify-self: center;
   animation: frame-arrival 1200ms 220ms both var(--ease-out);
   transform-style: preserve-3d;
@@ -425,8 +417,9 @@ svg {
 /* --- Interactive 3D layer --- */
 .hero-canvas {
   position: absolute;
-  inset: -8% -12%;
-  width: 124%;
+  z-index: 1;
+  inset: -8% -10%;
+  width: 120%;
   height: 116%;
   display: none;
   opacity: 0;
@@ -457,7 +450,7 @@ svg {
   position: absolute;
   bottom: -0.2rem;
   left: 50%;
-  z-index: 2;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -807,27 +800,20 @@ svg {
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(1.4rem, 2.8vw, 3rem) clamp(0.9rem, 2vw, 1.9rem);
-  align-items: start;
+  gap: clamp(2rem, 3.2vw, 3.6rem) clamp(1rem, 2vw, 2rem);
+  align-items: stretch;
   perspective: 1400px;
 }
 
 .art-card {
   position: relative;
+  display: grid;
   min-width: 0;
+  grid-template-rows: auto 1fr;
   cursor: pointer;
   background: transparent;
   transform-style: preserve-3d;
   transition: transform 500ms var(--ease-out);
-}
-
-.art-card:nth-child(8n + 2),
-.art-card:nth-child(8n + 7) {
-  transform: translateY(1.7rem);
-}
-
-.art-card:nth-child(8n + 4) {
-  transform: translateY(0.6rem);
 }
 
 .art-card:hover,
@@ -973,6 +959,7 @@ svg {
 }
 
 .card-copy {
+  min-height: 5.1rem;
   padding: 0.9rem 0.28rem 0;
 }
 
@@ -1120,16 +1107,16 @@ svg {
   font-family: var(--mono);
 }
 
-.mobile-nav {
+.museum-dock {
   position: fixed;
   z-index: 19;
   right: auto;
   bottom: max(1rem, env(safe-area-inset-bottom));
   left: 50%;
   display: grid;
-  width: min(calc(100% - 2rem), 23rem);
-  min-height: 4.7rem;
-  padding: 0.42rem;
+  width: min(calc(100% - 2rem), 11.8rem);
+  min-height: 3.8rem;
+  padding: 0.34rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.16rem;
   border: 1px solid var(--glass-border);
@@ -1144,6 +1131,8 @@ svg {
   transform: translateX(-50%);
   isolation: isolate;
   transition:
+    width 380ms var(--ease-out),
+    min-height 380ms var(--ease-out),
     opacity 220ms var(--ease),
     transform 300ms var(--ease-out),
     visibility 220ms var(--ease);
@@ -1151,8 +1140,14 @@ svg {
   backdrop-filter: blur(30px) saturate(1.5);
 }
 
-body:has(.art-dialog[open]) .mobile-nav,
-body.overlay-open .mobile-nav {
+.museum-dock:is(:hover, :focus-within),
+.museum-dock[data-expanded="true"] {
+  width: min(calc(100% - 2rem), 23rem);
+  min-height: 4.65rem;
+}
+
+body:has(.art-dialog[open]) .museum-dock,
+body.overlay-open .museum-dock {
   visibility: hidden;
   opacity: 0;
   transform: translateX(-50%) translateY(1rem) scale(0.96);
@@ -1163,7 +1158,7 @@ body.overlay-open {
   overflow: hidden;
 }
 
-.mobile-nav::before {
+.museum-dock::before {
   position: absolute;
   z-index: -1;
   top: 0.22rem;
@@ -1177,13 +1172,13 @@ body.overlay-open {
   pointer-events: none;
 }
 
-.mobile-nav a,
-.mobile-nav button {
+.museum-dock a,
+.museum-dock button {
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 3.8rem;
-  padding: 0.38rem 0.2rem 0.32rem;
+  min-height: 3.1rem;
+  padding: 0.3rem 0.2rem;
   place-items: center;
   align-content: center;
   gap: 0.16rem;
@@ -1201,13 +1196,21 @@ body.overlay-open {
     box-shadow 220ms var(--ease);
 }
 
-.mobile-nav a:hover,
-.mobile-nav button:hover {
+.museum-dock:is(:hover, :focus-within) a,
+.museum-dock:is(:hover, :focus-within) button,
+.museum-dock[data-expanded="true"] a,
+.museum-dock[data-expanded="true"] button {
+  min-height: 3.75rem;
+  padding: 0.38rem 0.2rem 0.32rem;
+}
+
+.museum-dock a:hover,
+.museum-dock button:hover {
   color: #fffaf0;
   transform: translateY(-2px);
 }
 
-.mobile-nav .dock-icon {
+.museum-dock .dock-icon {
   position: relative;
   display: grid;
   width: 1.65rem;
@@ -1215,24 +1218,39 @@ body.overlay-open {
   place-items: center;
 }
 
-.mobile-nav svg {
+.museum-dock svg {
   width: 1.28rem;
   height: 1.28rem;
   stroke-width: 1.55;
   transition: transform 280ms var(--ease-out);
 }
 
-.mobile-nav a:hover svg,
-.mobile-nav button:hover svg {
+.museum-dock a:hover svg,
+.museum-dock button:hover svg {
   transform: scale(1.08);
 }
 
-.mobile-nav .dock-label {
+.museum-dock .dock-label {
   display: block;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(0.2rem);
   white-space: nowrap;
+  transition:
+    max-width 340ms var(--ease-out),
+    opacity 200ms var(--ease),
+    transform 300ms var(--ease-out);
 }
 
-.mobile-nav .is-active {
+.museum-dock:is(:hover, :focus-within) .dock-label,
+.museum-dock[data-expanded="true"] .dock-label {
+  max-width: 4rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.museum-dock .is-active {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.2), transparent 46%),
     rgba(255, 248, 234, 0.13);
@@ -1242,9 +1260,9 @@ body.overlay-open {
   color: #f8d997;
 }
 
-.mobile-nav .is-active::after {
+.museum-dock .is-active::after {
   position: absolute;
-  bottom: 0.22rem;
+  bottom: 0.18rem;
   width: 0.28rem;
   height: 0.28rem;
   border-radius: 50%;
@@ -1253,22 +1271,9 @@ body.overlay-open {
   content: "";
 }
 
-.dock-badge {
-  position: absolute;
-  top: -0.2rem;
-  right: -0.28rem;
-  display: grid;
-  min-width: 1rem;
-  height: 1rem;
-  padding: 0 0.18rem;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 999px;
-  background: var(--vermilion);
-  color: #fff;
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  line-height: 1;
+.museum-dock:is(:hover, :focus-within) .is-active::after,
+.museum-dock[data-expanded="true"] .is-active::after {
+  bottom: 0.2rem;
 }
 
 body:not([data-page="home"]) {
@@ -2150,7 +2155,7 @@ button.result-item {
   .hero-art {
     width: min(17rem, 72vw);
     margin-top: 0;
-    justify-self: end;
+    justify-self: center;
   }
 
   .hero-art-frame,
@@ -2330,12 +2335,12 @@ button.result-item {
     text-align: left;
   }
 
-  .mobile-nav {
+  .museum-dock {
     right: auto;
     bottom: max(0.45rem, env(safe-area-inset-bottom));
     left: 50%;
-    width: min(calc(100% - 1.6rem), 20rem);
-    min-height: 4.15rem;
+    width: 10.8rem;
+    min-height: 3.75rem;
     padding: 0.32rem;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.08rem;
@@ -2343,22 +2348,36 @@ button.result-item {
     transform: translateX(-50%);
   }
 
-  .mobile-nav a,
-  .mobile-nav button {
+  .museum-dock[data-expanded="true"],
+  .museum-dock:focus-within {
+    width: min(calc(100% - 1.6rem), 20rem);
+    min-height: 4.15rem;
+  }
+
+  .museum-dock a,
+  .museum-dock button {
     width: 100%;
-    min-height: 3.45rem;
-    padding: 0.3rem 0.02rem 0.26rem;
+    min-height: 3.05rem;
+    padding: 0.3rem 0.02rem;
     gap: 0.16rem;
     border-radius: 0.9rem;
     font-size: 0.68rem;
   }
 
-  .mobile-nav svg {
+  .museum-dock[data-expanded="true"] a,
+  .museum-dock[data-expanded="true"] button,
+  .museum-dock:focus-within a,
+  .museum-dock:focus-within button {
+    min-height: 3.45rem;
+    padding: 0.3rem 0.02rem 0.26rem;
+  }
+
+  .museum-dock svg {
     width: 1.24rem;
     height: 1.24rem;
   }
 
-  .mobile-nav .is-active {
+  .museum-dock .is-active {
     border-radius: 0.9rem;
   }
 

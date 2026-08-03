@@ -189,6 +189,48 @@ function bindRouteLinks() {
   });
 }
 
+function initDock() {
+  const dock = $(".museum-dock");
+  if (!dock) return;
+  let expandOnly = false;
+
+  const setExpanded = (expanded) => {
+    dock.dataset.expanded = String(expanded);
+  };
+
+  dock.addEventListener("focusin", () => setExpanded(true));
+  dock.addEventListener("focusout", (event) => {
+    if (!dock.contains(event.relatedTarget)) setExpanded(false);
+  });
+  dock.addEventListener("pointerenter", (event) => {
+    if (event.pointerType !== "touch") setExpanded(true);
+  });
+  dock.addEventListener("pointerleave", (event) => {
+    if (event.pointerType !== "touch") setExpanded(false);
+  });
+  dock.addEventListener("pointerdown", () => {
+    const coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    expandOnly = coarse && dock.dataset.expanded !== "true";
+    if (expandOnly) {
+      setExpanded(true);
+    }
+  });
+  dock.addEventListener(
+    "click",
+    (event) => {
+      if (!expandOnly) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      expandOnly = false;
+    },
+    true,
+  );
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!dock.contains(event.target)) setExpanded(false);
+  });
+}
+
 // ---- Overlays (search / saved): float above the page, blur behind ----
 function openOverlay(name) {
   if (!overlayIds.has(name)) return;
@@ -249,7 +291,7 @@ function syncOverlays(restoreFocus = true) {
   });
 
   document.body.classList.toggle("overlay-open", Boolean(active));
-  [$(".site-header"), $("main"), $(".mobile-nav"), $(".site-footer")]
+  [$(".site-header"), $("main"), $(".museum-dock"), $(".site-footer")]
     .filter(Boolean)
     .forEach((element) => {
       element.inert = Boolean(active);
@@ -831,6 +873,7 @@ function init() {
   $("#hero-art-image").src = imageAssets.hero;
   updateSavedCount();
   bindRouteLinks();
+  initDock();
 
   // Top-bar buttons open floating overlays instead of routing to pages.
   $("#open-search").addEventListener("click", () => openOverlay("search"));

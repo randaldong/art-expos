@@ -319,12 +319,14 @@ export async function createHeroScene({ canvas, initialImage, onActivate }) {
 
   // ---- Resize to the hero-art box ----
   function resize() {
-    const rect = canvas.parentElement.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     const w = Math.max(1, rect.width);
     const h = Math.max(1, rect.height);
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    camera.position.z = 9 / Math.min(1, (w / h) / 0.7);
+    // Keep enough breathing room for the full diagonal of the frame while it
+    // spins; the CSS canvas is intentionally larger than the layout frame.
+    camera.position.z = 11.2 / Math.min(1, (w / h) / 0.72);
     camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(resize);

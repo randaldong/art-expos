@@ -30,3 +30,6 @@ temp/
 
 # Agent files
 .agent/
+
+# Legacy app-builder metadata
+.spark/
