@@ -27,7 +27,7 @@ python3 -m http.server 4173 --directory .
 - GitHub 仓库：`https://github.com/randaldong/art-expos`
 - 生产分支：`main`
 - 当前 Cloudflare 项目是 Workers Static 模式；Cloudflare 里 Deploy command 填 `npm run deploy`。
-- `npm run deploy` 会先把 `index.html`、`assets/`、`data/` 复制到 `dist/`，再通过 `wrangler deploy` 发布 `dist/`。这样不会把 `node_modules/` 或 Wrangler 临时依赖当作静态资源上传。
+- `npm run deploy` 会先把 `index.html`、`assets/`、`data/` 复制到 `dist/`，再通过 `npx wrangler deploy` 发布 `dist/`。这样不会把 `node_modules/` 或 Wrangler 临时依赖当作静态资源上传，也不依赖 Cloudflare 环境预装 Wrangler。
 - Cloudflare 项目连接 GitHub 后，提交并推送到 `main` 会自动触发部署。
 - Spaceship 购买的域名可以接入 Cloudflare，不需要中国大陆 ICP 备案；在 Cloudflare 添加站点后，把 Spaceship 后台的 nameserver 改为 Cloudflare 提供的两条 nameserver，然后在 Workers 自定义域名里绑定即可。
 - 日常更新流程：
