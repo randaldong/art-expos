@@ -767,59 +767,69 @@ body[data-page="home"] .how-to h2 em {
 }
 
 .chapter-list {
-  margin-top: clamp(3rem, 7vw, 7rem);
-  border-top: 1px solid rgba(86, 57, 45, 0.16);
+  display: grid;
+  margin-top: clamp(2.4rem, 6vw, 5.5rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.9rem, 2vw, 1.4rem);
+  counter-reset: chapter;
 }
 
 .chapter-card {
   position: relative;
   display: grid;
-  padding: 1.05rem 0.95rem;
-  grid-template-columns: 5rem minmax(0, 1fr) minmax(12rem, 0.7fr) 2.2rem;
-  gap: 1rem;
-  align-items: center;
-  border-bottom: 1px solid rgba(86, 57, 45, 0.16);
-  border-radius: 0.55rem;
+  min-height: 17.5rem;
+  padding: 1.25rem;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.9rem;
+  align-items: start;
+  border: 1px solid rgba(86, 57, 45, 0.14);
+  border-radius: 0.85rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.26) 48%, rgba(194, 154, 91, 0.08)),
+    rgba(255, 250, 241, 0.62);
+  box-shadow:
+    0 1rem 2.4rem rgba(69, 41, 29, 0.07),
+    inset 0 1px rgba(255, 255, 255, 0.72);
   color: inherit;
   overflow: hidden;
   transition:
-    background 240ms var(--ease),
     border-color 240ms var(--ease),
     box-shadow 240ms var(--ease),
-    color 240ms var(--ease),
     transform 260ms var(--ease-out);
 }
 
-.chapter-card::before {
+.chapter-card::before,
+.chapter-card::after {
   position: absolute;
-  z-index: 0;
   content: "";
-  top: 0.85rem;
-  bottom: 0.85rem;
-  left: 0;
-  width: 0.18rem;
-  border-radius: 999px;
-  background: var(--gold);
-  opacity: 0;
-  transform: scaleY(0.45);
-  transition: opacity 220ms var(--ease), transform 260ms var(--ease-out);
+  pointer-events: none;
+}
+
+.chapter-card::before {
+  top: 1rem;
+  right: 1rem;
+  width: 4.6rem;
+  height: 4.6rem;
+  border: 1px solid rgba(194, 154, 91, 0.22);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(194, 154, 91, 0.1), transparent 62%);
+}
+
+.chapter-card::after {
+  right: -1.3rem;
+  bottom: -1.4rem;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background: rgba(134, 44, 44, 0.055);
 }
 
 .chapter-card:hover {
-  border-color: rgba(194, 154, 91, 0.36);
-  background:
-    linear-gradient(90deg, rgba(194, 154, 91, 0.12), rgba(255, 255, 255, 0.26) 44%, transparent),
-    rgba(255, 250, 241, 0.64);
+  border-color: rgba(194, 154, 91, 0.34);
   box-shadow:
-    0 1.2rem 2.6rem rgba(64, 37, 25, 0.08),
-    inset 0 1px rgba(255, 255, 255, 0.66);
-  color: var(--wine);
-  transform: translateY(-0.12rem);
-}
-
-.chapter-card:hover::before {
-  opacity: 1;
-  transform: scaleY(1);
+    0 1.5rem 3rem rgba(69, 41, 29, 0.12),
+    inset 0 1px rgba(255, 255, 255, 0.78);
+  transform: translateY(-0.18rem);
 }
 
 .chapter-card > * {
@@ -827,11 +837,30 @@ body[data-page="home"] .how-to h2 em {
   z-index: 1;
 }
 
-.chapter-range {
-  color: var(--vermilion);
+.chapter-index {
+  display: inline-flex;
+  width: 2.2rem;
+  height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(134, 44, 44, 0.16);
+  border-radius: 50%;
+  color: var(--oxblood);
   font-family: var(--display);
-  font-size: 1.45rem;
+  font-size: 1.05rem;
   font-style: italic;
+  background: rgba(255, 250, 241, 0.72);
+}
+
+.chapter-range {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  color: #8a6a3c;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
 }
 
 .chapter-range > span,
@@ -843,40 +872,46 @@ body[data-page="home"] .how-to h2 em {
   display: none;
 }
 
-.chapter-card:hover .chapter-range {
-  color: var(--oxblood);
-}
-
 .chapter-card h3,
 .chapter-card p {
   margin: 0;
 }
 
 .chapter-card h3 {
-  font-size: clamp(1.35rem, 2.2vw, 2.1rem);
-  font-weight: 500;
-  letter-spacing: -0.035em;
+  max-width: 16rem;
+  color: var(--wine);
+  font-size: clamp(1.32rem, 2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.22;
 }
 
 .chapter-card p {
-  color: #716256;
-  font-size: 0.79rem;
-  line-height: 1.6;
+  color: #6b5a4b;
+  font-size: 0.86rem;
+  line-height: 1.75;
 }
 
-.chapter-card:hover p {
-  color: #5e5045;
-}
-
-.chapter-card svg {
-  justify-self: end;
-  color: rgba(134, 44, 44, 0.62);
-  transition: color 220ms var(--ease), transform 260ms var(--ease-out);
-}
-
-.chapter-card:hover svg {
+.chapter-action {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.38rem;
+  align-self: end;
+  border-bottom: 1px solid rgba(134, 44, 44, 0.28);
   color: var(--oxblood);
-  transform: translateX(0.18rem);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.chapter-action svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 220ms var(--ease-out);
+}
+
+.chapter-card:hover .chapter-action svg {
+  transform: translateX(0.16rem);
 }
 
 .collection-section {
@@ -1077,8 +1112,11 @@ body[data-page="home"] .how-to h2 em {
 }
 
 .card-copy {
+  display: grid;
   min-height: 6.2rem;
   padding: 0.95rem 0.28rem 0;
+  grid-template-rows: minmax(3.55rem, auto) 1.75rem;
+  align-content: start;
 }
 
 .card-copy p,
@@ -1087,11 +1125,15 @@ body[data-page="home"] .how-to h2 em {
 }
 
 .card-copy h3 {
+  display: -webkit-box;
   font-size: clamp(1rem, 1.45vw, 1.28rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.38;
+  overflow: hidden;
   text-wrap: balance;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .card-copy h3 span {
@@ -1103,30 +1145,42 @@ body[data-page="home"] .how-to h2 em {
 
 .post-author {
   display: flex;
-  margin-top: 0.72rem !important;
+  min-width: 0;
+  margin-top: 0.65rem !important;
   align-items: center;
   gap: 0.48rem;
+  align-self: end;
   color: #6f5d50;
   font-size: 0.78rem;
   line-height: 1.25;
 }
 
+.post-author > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .artist-avatar {
-  display: inline-grid;
-  width: 1.55rem;
-  height: 1.55rem;
+  position: relative;
+  display: inline-block;
+  width: 1.82rem;
+  height: 1.82rem;
   flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid rgba(134, 44, 44, 0.18);
+  border: 1px solid rgba(134, 44, 44, 0.2);
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.7), transparent 42%),
-    #e7d7bb;
-  color: var(--oxblood);
-  font-family: var(--display);
-  font-size: 0.8rem;
-  font-style: italic;
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.65);
+  background: #d8c3a2;
+  box-shadow:
+    0 0 0 0.13rem rgba(255, 250, 239, 0.7),
+    0 0.2rem 0.55rem rgba(63, 35, 26, 0.16);
+  overflow: hidden;
+}
+
+.artist-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.08) saturate(0.82) contrast(1.05);
 }
 
 .reveal-on-scroll {
@@ -2276,48 +2330,42 @@ button.result-item {
   }
 
   .chapter-list {
-    margin-top: 2.7rem;
+    margin-top: 2.4rem;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
   }
 
   .chapter-card {
-    padding: 1.2rem 0;
-    grid-template-columns: minmax(0, 1fr) 1.6rem;
+    min-height: auto;
+    padding: 1.05rem;
+    grid-template-rows: auto auto auto auto;
     gap: 0.65rem;
-    align-items: center;
+  }
+
+  .chapter-index {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.95rem;
   }
 
   .chapter-range {
-    display: grid;
-    gap: 0.26rem;
-    font-family: var(--mono);
-    font-size: 0.76rem;
-    font-style: normal;
-    letter-spacing: 0.04em;
-    line-height: 1.35;
+    font-size: 0.68rem;
   }
 
-  .chapter-range > span {
-    color: var(--vermilion);
-  }
-
-  .chapter-range strong {
-    display: block;
-    color: var(--ink);
-    font-family: var(--serif);
+  .chapter-card h3 {
+    max-width: none;
     font-size: 1.28rem;
-    font-weight: 600;
-    letter-spacing: -0.035em;
+    line-height: 1.28;
   }
 
-  .chapter-card h3,
   .chapter-card p {
-    display: none;
+    font-size: 0.82rem;
+    line-height: 1.7;
   }
 
-  .chapter-card svg {
-    grid-row: 1;
-    grid-column: 2;
-    align-self: center;
+  .chapter-action {
+    margin-top: 0.1rem;
+    font-size: 0.78rem;
   }
 
   .filter-bar {
@@ -2366,9 +2414,8 @@ button.result-item {
   }
 
   .artist-avatar {
-    width: 1.42rem;
-    height: 1.42rem;
-    font-size: 0.74rem;
+    width: 1.55rem;
+    height: 1.55rem;
   }
 
   .save-work {

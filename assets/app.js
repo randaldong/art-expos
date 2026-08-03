@@ -30,7 +30,44 @@ const bookmarkIcon = (filled = false) => `
   </svg>
 `;
 
+const artistPortraits = {
+  "达·芬奇": "leonardo.png",
+  "临摹达·芬奇": "leonardo.png",
+  梅尔齐: "melzi.jpg",
+  米开朗基罗: "michelangelo.jpg",
+  拉斐尔: "raphael.jpg",
+  "拉斐尔工作室": "raphael.jpg",
+  波提切利: "botticelli.jpg",
+  "乔瓦尼·贝利尼": "bellini.jpg",
+  乔尔乔内: "giorgione.jpg",
+  提香: "titian.jpg",
+  丁托列托: "tintoretto.jpg",
+  卡拉瓦乔: "caravaggio.jpg",
+  老帕尔马: "palma.jpg",
+  小巴萨诺: "bassano.jpg",
+  蓬托尔莫: "pontormo.jpg",
+  布隆齐诺: "bronzino.jpg",
+  "罗索·菲奥伦蒂诺": "rosso.jpg",
+  "皮耶罗·本奇": "pollaiolo.jpg",
+  阿洛里: "allori.jpg",
+  孔特: "conte.jpg",
+  祖基: "zuccari.jpg",
+  斯特拉达诺: "stradano.jpeg",
+  "多梅尼科·里乔": "bassano.jpg",
+  帕尔米贾尼诺: "parmigianino.jpg",
+};
+
 const artworkById = (id) => artworks.find((artwork) => artwork.id === Number(id));
+
+function artistAvatar(artistName) {
+  const portrait = artistPortraits[artistName] || "raphael.jpg";
+
+  return `
+    <span class="artist-avatar" aria-hidden="true">
+      <img src="./assets/artists/${portrait}" alt="" loading="lazy" />
+    </span>
+  `;
+}
 
 function pageFromLocation() {
   const page = new URLSearchParams(window.location.search).get("page");
@@ -288,17 +325,21 @@ function syncOverlays(restoreFocus = true) {
 function renderChapters() {
   $("#chapter-list").innerHTML = chapters
     .map(
-      (chapter) => `
+      (chapter, index) => `
         <a class="chapter-card" href="?page=collection&chapter=${chapter.id}" data-chapter="${chapter.id}">
+          <span class="chapter-index">${number(index + 1)}</span>
           <span class="chapter-range">
             <span>${chapter.range}</span>
             <strong>${chapter.title}</strong>
           </span>
           <h3>${chapter.title}</h3>
           <p>${chapter.description}</p>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path>
-          </svg>
+          <span class="chapter-action">
+            <span>进入此章</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 12h15"></path><path d="m13 6 6 6-6 6"></path>
+            </svg>
+          </span>
         </a>
       `,
     )
@@ -356,7 +397,6 @@ function displayedArtworks() {
 
 function cardTemplate(artwork) {
   const saved = state.saved.has(artwork.id);
-  const artistInitial = artwork.artist.replace(/^临摹/, "").trim().slice(0, 1);
   return `
     <article class="art-card" data-artwork="${artwork.id}">
       <button class="art-open" type="button" aria-label="打开${artwork.artist}《${artwork.title}》的详情">
@@ -367,7 +407,7 @@ function cardTemplate(artwork) {
         <div class="card-copy">
           <h3>${artwork.title}${artwork.subtitle ? `<span>${artwork.subtitle}</span>` : ""}</h3>
           <p class="post-author">
-            <span class="artist-avatar" aria-hidden="true">${artistInitial}</span>
+            ${artistAvatar(artwork.artist)}
             <span>${artwork.artist}</span>
           </p>
         </div>
