@@ -19,7 +19,7 @@ const state = {
 const $ = (selector, parent = document) => parent.querySelector(selector);
 const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
 const number = (id) => String(id).padStart(2, "0");
-const pageIds = new Set(["home", "route", "collection"]);
+const pageIds = new Set(["home", "collection"]);
 const overlayIds = new Set(["search", "saved"]);
 let revealObserver;
 let lastOverlayTrigger = null;
@@ -34,6 +34,7 @@ const artworkById = (id) => artworks.find((artwork) => artwork.id === Number(id)
 
 function pageFromLocation() {
   const page = new URLSearchParams(window.location.search).get("page");
+  if (page === "route") return "collection";
   return pageIds.has(page) ? page : "home";
 }
 
@@ -137,11 +138,11 @@ function renderPage(page = state.currentPage) {
   });
 
   document.body.dataset.page = page;
+  document.documentElement.dataset.page = page;
   updateRouteLinks();
 
-  if (page === "route") {
+  if (page === "collection") {
     renderChapters();
-  } else if (page === "collection") {
     renderFilters();
     renderGallery();
   }
@@ -159,7 +160,7 @@ function saveScrollPosition() {
 
 function navigateTo(
   page,
-  { activeFilter = state.activeFilter } = {},
+  { activeFilter = state.activeFilter, scrollTarget = null } = {},
 ) {
   const nextPage = pageIds.has(page) ? page : "home";
   // Leaving for a page always closes any open overlay.
@@ -177,57 +178,22 @@ function navigateTo(
   state.activeFilter = nextState.activeFilter;
   renderPage(nextPage);
   syncOverlays();
-  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  const target = scrollTarget ? document.getElementById(scrollTarget) : null;
+  if (target) {
+    requestAnimationFrame(() => target.scrollIntoView({ block: "start", behavior: "smooth" }));
+  } else {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }
 }
 
 function bindRouteLinks() {
   $$("[data-route-page]").forEach((element) => {
     element.addEventListener("click", (event) => {
       event.preventDefault();
-      navigateTo(element.dataset.routePage);
+      navigateTo(element.dataset.routePage, {
+        scrollTarget: element.dataset.routeTarget || null,
+      });
     });
-  });
-}
-
-function initDock() {
-  const dock = $(".museum-dock");
-  if (!dock) return;
-  let expandOnly = false;
-
-  const setExpanded = (expanded) => {
-    dock.dataset.expanded = String(expanded);
-  };
-
-  dock.addEventListener("focusin", () => setExpanded(true));
-  dock.addEventListener("focusout", (event) => {
-    if (!dock.contains(event.relatedTarget)) setExpanded(false);
-  });
-  dock.addEventListener("pointerenter", (event) => {
-    if (event.pointerType !== "touch") setExpanded(true);
-  });
-  dock.addEventListener("pointerleave", (event) => {
-    if (event.pointerType !== "touch") setExpanded(false);
-  });
-  dock.addEventListener("pointerdown", () => {
-    const coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
-    expandOnly = coarse && dock.dataset.expanded !== "true";
-    if (expandOnly) {
-      setExpanded(true);
-    }
-  });
-  dock.addEventListener(
-    "click",
-    (event) => {
-      if (!expandOnly) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      expandOnly = false;
-    },
-    true,
-  );
-
-  document.addEventListener("pointerdown", (event) => {
-    if (!dock.contains(event.target)) setExpanded(false);
   });
 }
 
@@ -291,7 +257,7 @@ function syncOverlays(restoreFocus = true) {
   });
 
   document.body.classList.toggle("overlay-open", Boolean(active));
-  [$(".site-header"), $("main"), $(".museum-dock"), $(".site-footer")]
+  [$(".site-header"), $("main")]
     .filter(Boolean)
     .forEach((element) => {
       element.inert = Boolean(active);
@@ -341,7 +307,11 @@ function renderChapters() {
   $$(".chapter-card").forEach((item) => {
     item.addEventListener("click", (event) => {
       event.preventDefault();
-      navigateTo("collection", { activeFilter: item.dataset.chapter });
+      state.activeFilter = item.dataset.chapter;
+      renderFilters();
+      renderGallery();
+      updateCurrentRoute();
+      $("#collection")?.scrollIntoView({ block: "start", behavior: "smooth" });
     });
   });
 }
@@ -386,6 +356,7 @@ function displayedArtworks() {
 
 function cardTemplate(artwork) {
   const saved = state.saved.has(artwork.id);
+  const artistInitial = artwork.artist.replace(/^临摹/, "").trim().slice(0, 1);
   return `
     <article class="art-card" data-artwork="${artwork.id}">
       <button class="art-open" type="button" aria-label="打开${artwork.artist}《${artwork.title}》的详情">
@@ -394,11 +365,14 @@ function cardTemplate(artwork) {
           <span class="card-no">${number(artwork.id)}</span>
         </div>
         <div class="card-copy">
-          <p>${artwork.artist}</p>
           <h3>${artwork.title}${artwork.subtitle ? `<span>${artwork.subtitle}</span>` : ""}</h3>
+          <p class="post-author">
+            <span class="artist-avatar" aria-hidden="true">${artistInitial}</span>
+            <span>${artwork.artist}</span>
+          </p>
         </div>
       </button>
-      <button class="save-work ${saved ? "is-saved" : ""}" data-save="${artwork.id}" type="button" aria-label="${saved ? "取消收藏" : "收藏"} ${artwork.title}">
+      <button class="save-work ${saved ? "is-saved" : ""}" data-save="${artwork.id}" type="button" aria-label="${saved ? "移出回看册" : "加入回看册"} ${artwork.title}">
         ${bookmarkIcon(saved)}
       </button>
     </article>
@@ -449,7 +423,7 @@ function renderDialog(artwork) {
   const signals = note?.symbols || [];
 
   $("#dialog-content").innerHTML = `
-    <button class="dialog-close" data-dialog-close type="button" aria-label="返回作品清单" autofocus>
+    <button class="dialog-close" data-dialog-close type="button" aria-label="返回作品长廊" autofocus>
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m6.8 6.8 10.4 10.4"></path>
         <path d="m17.2 6.8-10.4 10.4"></path>
@@ -542,7 +516,7 @@ function renderDialog(artwork) {
             : ""
         }
         <button class="dialog-save ${saved ? "is-saved" : ""}" data-save="${artwork.id}" type="button">
-          ${bookmarkIcon(saved)} ${saved ? "已加入私人清单" : "加入私人清单"}
+          ${bookmarkIcon(saved)} ${saved ? "已在回看册" : "加入回看册"}
         </button>
       </article>
     </div>
@@ -717,7 +691,7 @@ function renderSaved() {
         `,
         )
         .join("")
-    : `<p class="empty-state">还没有收藏。遇到想再看的作品时，点一下书签。</p>`;
+    : `<p class="empty-state">回看册还是空的。遇到想再看的作品时，点一下书签。</p>`;
 
   $$("[data-saved-result]", $("#saved-results")).forEach((button) => {
     button.addEventListener("click", () => {
@@ -873,7 +847,6 @@ function init() {
   $("#hero-art-image").src = imageAssets.hero;
   updateSavedCount();
   bindRouteLinks();
-  initDock();
 
   // Top-bar buttons open floating overlays instead of routing to pages.
   $("#open-search").addEventListener("click", () => openOverlay("search"));
